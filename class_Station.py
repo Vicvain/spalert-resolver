@@ -7,8 +7,8 @@ class Station:
     - deck_str = deck used for display purposes -> str
     - players = players currently in this station -> [class Player]
     - internal_threats -> [class Threat]
-    - towards_red = station to the left, can be None -> class Station
-    - towards_blue = station to the right, can be None -> class Station
+    - towards_red = station to the left, can be the same (red) -> class Station
+    - towards_blue = station to the right, can be the same (blue) -> class Station
     - other_deck = station on the other deck, using the gravolift -> class Station
 
     Methods

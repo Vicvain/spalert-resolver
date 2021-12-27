@@ -50,13 +50,9 @@ class Player:
         match self.actions[turn]:
             case Action.MOVE_RED:
                 destination = self.station.towards_red
-                if destination is not None:
-                    self.move(destination)
 
             case Action.MOVE_BLUE:
                 destination = self.station.towards_blue
-                if destination is not None:
-                    self.move(destination)
 
             case Action.GRAVOLIFT:
                 destination = self.station.other_deck

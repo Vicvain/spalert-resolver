@@ -32,13 +32,13 @@ class Spaceship():
         # -> Towards blue side 
         self.red_zone.upper_station.towards_blue = self.white_zone.upper_station
         self.red_zone.lower_station.towards_blue = self.white_zone.lower_station
-        self.white_zone.upper_station.towards_blue = self.blue_zone.upper_station
-        self.white_zone.lower_station.towards_blue = self.blue_zone.lower_station
+        self.white_zone.upper_station.towards_blue = self.blue_zone.upper_station.towards_blue = self.blue_zone.upper_station
+        self.white_zone.lower_station.towards_blue = self.blue_zone.lower_station.towards_blue = self.blue_zone.lower_station
         # -> Towards red side
         self.blue_zone.upper_station.towards_red = self.white_zone.upper_station
         self.blue_zone.lower_station.towards_red = self.white_zone.lower_station
-        self.white_zone.upper_station.towards_red = self.red_zone.upper_station
-        self.white_zone.lower_station.towards_red = self.red_zone.lower_station
+        self.white_zone.upper_station.towards_red = self.red_zone.upper_station.towards_red = self.red_zone.upper_station
+        self.white_zone.lower_station.towards_red = self.red_zone.lower_station.towards_red = self.red_zone.lower_station
 
         # Put all players on bridge
         self.white_zone.upper_station.players = list(players) # Making a shallow copy here is important
