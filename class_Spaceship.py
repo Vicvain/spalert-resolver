@@ -56,5 +56,5 @@ class Spaceship():
 
             for player in self.players:
                 player.play_action(turn)
-                print("Player " + player.color + " position: " + player.station.deck_str + " " + player.zone().color_str)
+                print("Player " + player.color + " position: " + player.station.deck_str + " " + player.zone.color_str)
                 
