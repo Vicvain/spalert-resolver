@@ -18,6 +18,7 @@ class Player:
         self.actions = [None] * 12
         self.station = None
 
+    @ property
     def zone(self):
         return self.station.zone
 
@@ -57,11 +58,11 @@ class Player:
             case Action.GRAVOLIFT:
                 destination = self.station.other_deck
                 
-                if self.zone().used_gravolift:
+                if self.zone.used_gravolift:
                     self.delay(turn + 1)
 
                 self.move(destination)
-                self.zone().used_gravolift = True
+                self.zone.used_gravolift = True
 
             case Action.BUTTON_A:
                 pass
