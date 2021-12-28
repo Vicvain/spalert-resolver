@@ -1,7 +1,6 @@
 from functools import partialmethod
 from enum import Enum
 
-
 class Threat:
     """
     Definition of a threat
@@ -18,6 +17,7 @@ class Threat:
     - position_on_track -> int
     - status = can be: NotYetSpawned, Active, Survived, Destroyed -> class ThreatStatus
     - spawn_turn = the turn at which the threat appears -> int
+    - planned_damage = total damage dealt by the weapons it's targeted by -> int
     """
 
     def __init__(self, name, health, shield, speed, points_when_survived, points_when_destroyed):
@@ -35,6 +35,7 @@ class Threat:
         self.position_on_track = None
         self.status = ThreatStatus.NotYetSpawned
         self.spawn_turn = None
+        self.planned_damage = 0
 
     @property
     def is_active(self):
@@ -70,16 +71,28 @@ class Threat:
                     self.status = ThreatStatus.Survived
                     break
     
+    def is_in_range(self, weapon_range, weapon_type):
+        return weapon_range >= 3 or self.position_on_track < weapon_range*5
+
+    def try_to_target(self, weapon_damage, weapon_range, weapon_type):
+        if self.is_in_range(weapon_range, weapon_type):
+            self.planned_damage += weapon_damage
+            return True
+        else:
+            return False
+
     def damage(self, damage):
         """
         Inflicts damage to the threat (reduced by shield)
         """
         damage -= self.shield
+        print(f"{self.name} recieves {damage} damage through shields")
         if damage > 0:
             self.health -= damage
             if self.health <= 0:
                 self.position_on_track = None
                 self.status = ThreatStatus.Destroyed
+                print(f"{self.name} has been destroyed!")
         
 class ThreatStatus(Enum):
     NotYetSpawned = 0

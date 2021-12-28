@@ -49,14 +49,14 @@ class Galaxy():
         # TODO: player selection
 
         selected_tracks = sample(self.threat_tracks, 4)
-        selected_tracks[0].zone = self.spaceship.red_zone
-        selected_tracks[1].zone = self.spaceship.white_zone
-        selected_tracks[2].zone = self.spaceship.blue_zone
+        selected_tracks[1].zone = self.spaceship.red_zone
+        selected_tracks[2].zone = self.spaceship.white_zone
+        selected_tracks[3].zone = self.spaceship.blue_zone
 
         # TODO: threat selection
         threat1 = self.white_external_threats[0]
         threat2 = self.white_external_threats[1]
-        selected_tracks[1].assign_threat(threat=threat1, spawn_turn=2)
-        selected_tracks[1].assign_threat(threat=threat2, spawn_turn=7)
+        selected_tracks[3].assign_threat(threat=threat1, spawn_turn=2)
+        selected_tracks[3].assign_threat(threat=threat2, spawn_turn=7)
 
         self.spaceship.new_game(selected_tracks[0], selected_tracks[1], selected_tracks[2], selected_tracks[3], self.players[:4])

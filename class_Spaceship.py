@@ -11,17 +11,19 @@ class Spaceship():
     - blue_zone = starboard side (right) zone -> class Zone
     - internal_threat_track -> class ThreatTrack
     - players = all playing players -> [class Player]
+    - fuel_capsules = available fuel capsules to recharge central reactor -> int
 
     Methods
     - new_game = prepare for new game -> /
     - resolve_game = run game, returns whether or not the players won -> bool
     """
     def __init__(self):
-        self.red_zone = Zone("red")
-        self.white_zone = Zone("white")
-        self.blue_zone = Zone("blue")
+        self.red_zone = Zone(self, "red", max_energy=3, max_shield=2, upper_laser_damage=4, lower_laser_damage=2, lower_laser_range=3, lower_laser_type=WeaponType.LightLaser)
+        self.white_zone = Zone(self, "white", max_energy=5, max_shield=3, upper_laser_damage=5, lower_laser_damage=1, lower_laser_range=2, lower_laser_type=WeaponType.PulseCannon)
+        self.blue_zone = Zone(self, "blue", max_energy=3, max_shield=2, upper_laser_damage=4, lower_laser_damage=2, lower_laser_range=3, lower_laser_type=WeaponType.LightLaser)
         self.internal_threat_track = None
         self.players = []
+        self.fuel_capsules = 0
 
     def new_game(self, internal_track, red_track, white_track, blue_track, players):
         self.red_zone.new_game(energy=2, threat_track=red_track)
@@ -29,6 +31,7 @@ class Spaceship():
         self.blue_zone.new_game(energy=2, threat_track=blue_track)
         self.internal_threat_track = internal_track
         self.players = players
+        self.fuel_capsules = 3
 
         # Assign station neighbors
         # -> Towards blue side 
@@ -52,36 +55,67 @@ class Spaceship():
         yield self.blue_zone
     
     @property
-    def threat_tracks(self):
+    def external_threat_tracks(self):
         for zone in self.zones:
             yield zone.threat_track
-        yield self.internal_threat_track
 
     @property
     def threats(self):
-        for track in self.threat_tracks:
+        for track in self.external_threat_tracks:
             yield from track.threats
+        yield from self.internal_threat_track.threats
     
     def resolve_game(self):
         try:
-            for turn in range(12):
+            for turn in range(13):
                 print("Turn " + str(turn+1) + ":")
                 for zone in self.zones:
                     zone.new_turn()
                 
-                # Threat appears
-                for threat in self.threats:
-                    threat.try_spawn(current_turn=turn)
+                if turn < 8:
+                    # Threat appears
+                    for threat in self.threats:
+                        threat.try_spawn(current_turn=turn)
 
-                # Player actions
-                for player in self.players:
-                    player.play_action(turn)
-                    print("Player " + player.color + " position: " + player.station.deck_str + " " + player.zone.color_str)
+                if turn < 12:
+                    # Player actions
+                    for player in self.players:
+                        player.play_action(turn)
+                        print("Player " + player.color + " position: " + player.station.deck_str + " " + player.zone.color_str)
 
-                # Compute damage TODO
+                # Compute targeting
+                for track in self.external_threat_tracks:
+                    active_threats = [threat for threat in track.threats if threat.is_active]
+                    # Threats are sorted by how close they are to the ship. If tied, the earliest threat takes priority.
+                    sorted(active_threats, key=attrgetter("position_on_track", "spawn_turn"))
+                    
+                    for threat in active_threats:
+                        # Heavy and Light lasers
+                        for station in track.zone.stations:
+                            if station.laser_type != WeaponType.PulseCannon and station.fired_laser_cannon:
+                                if threat.try_to_target(station.laser_strength, station.laser_range, station.laser_type):
+                                    station.fired_laser_cannon = False
+                        
+                        # Pulse cannon
+                        lower_white = self.white_zone.lower_station
+                        if lower_white.fired_laser_cannon:
+                            threat.try_to_target(lower_white.laser_strength, lower_white.laser_range, lower_white.laser_type)
+                        
+                        # Rocket TODO
 
+                        # Interceptors TODO
+
+                # Compute damage
+                for track in self.external_threat_tracks:
+                    active_threats = [threat for threat in track.threats if threat.is_active]
+                    sorted(active_threats, key=attrgetter("spawn_turn"))
+                    for threat in active_threats:
+                        if threat.planned_damage > 0:
+                            threat.damage(threat.planned_damage)
+                            threat.planned_damage = 0
+                    
                 # Threat actions
-                for threat in sorted(self.threats, key=attrgetter("spawn_turn"), reverse=True):
+                for threat in sorted(self.threats, key=attrgetter("spawn_turn")):
                     if threat.is_active:
                         threat.advance()
                         if threat.is_active:
