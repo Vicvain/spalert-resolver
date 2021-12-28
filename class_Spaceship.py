@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from class_Zone import *
 from class_ThreatTrack import *
 
@@ -43,18 +45,50 @@ class Spaceship():
         # Put all players on bridge
         self.white_zone.upper_station.players = list(players) # Making a shallow copy here is important
     
+    @property
     def zones(self):
         yield self.red_zone
         yield self.white_zone
         yield self.blue_zone
     
-    def resolve_game(self):
-        for turn in range(12):
-            print("Turn " + str(turn+1) + ":")
-            for zone in self.zones():
-                zone.new_turn()
+    @property
+    def threat_tracks(self):
+        for zone in self.zones:
+            yield zone.threat_track
+        yield self.internal_threat_track
 
-            for player in self.players:
-                player.play_action(turn)
-                print("Player " + player.color + " position: " + player.station.deck_str + " " + player.zone().color_str)
+    @property
+    def threats(self):
+        for track in self.threat_tracks:
+            yield from track.threats
+    
+    def resolve_game(self):
+        try:
+            for turn in range(12):
+                print("Turn " + str(turn+1) + ":")
+                for zone in self.zones:
+                    zone.new_turn()
                 
+                # Threat appears
+                for threat in self.threats:
+                    threat.try_spawn(current_turn=turn)
+
+                # Player actions
+                for player in self.players:
+                    player.play_action(turn)
+                    print("Player " + player.color + " position: " + player.station.deck_str + " " + player.zone().color_str)
+
+                # Compute damage TODO
+
+                # Threat actions
+                for threat in sorted(self.threats, key=attrgetter("spawn_turn"), reverse=True):
+                    if threat.is_active:
+                        threat.advance()
+                        if threat.is_active:
+                            print(threat.name + ": " + threat.track.zone.color_str + "[" + str(threat.position_on_track) + "]")
+                
+                # TODO rocket advance
+        
+        except ShipDestroyed as failure:
+            print("Game lost :(")
+            print(f"Reason: {failure}")
