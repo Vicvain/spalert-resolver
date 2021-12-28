@@ -58,6 +58,7 @@ class Player:
             case Action.GRAVOLIFT:
                 destination = self.station.other_deck
                 
+                # TODO: broken gravolift delay
                 if self.zone.used_gravolift:
                     self.delay(turn + 1)
 
