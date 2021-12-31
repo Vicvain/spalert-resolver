@@ -11,17 +11,19 @@ class Spaceship():
     - blue_zone = starboard side (right) zone -> class Zone
     - internal_threat_track -> class ThreatTrack
     - players = all playing players -> [class Player]
+    - fuel_capsules = available fuel capsules to recharge central reactor -> int
 
     Methods
     - new_game = prepare for new game -> /
     - resolve_game = run game, returns whether or not the players won -> bool
     """
     def __init__(self):
-        self.red_zone = Zone("red")
-        self.white_zone = Zone("white")
-        self.blue_zone = Zone("blue")
+        self.red_zone = Zone(self, "red", max_energy=3, max_shield=2, upper_laser_damage=4, lower_laser_damage=2, lower_laser_range=3, lower_laser_type=WeaponType.LightLaser)
+        self.white_zone = Zone(self, "white", max_energy=5, max_shield=3, upper_laser_damage=5, lower_laser_damage=1, lower_laser_range=2, lower_laser_type=WeaponType.PulseCannon)
+        self.blue_zone = Zone(self, "blue", max_energy=3, max_shield=2, upper_laser_damage=4, lower_laser_damage=2, lower_laser_range=3, lower_laser_type=WeaponType.LightLaser)
         self.internal_threat_track = None
         self.players = []
+        self.fuel_capsules = 0
 
     def new_game(self, internal_track, red_track, white_track, blue_track, players):
         self.red_zone.new_game(energy=2, threat_track=red_track)
@@ -29,6 +31,7 @@ class Spaceship():
         self.blue_zone.new_game(energy=2, threat_track=blue_track)
         self.internal_threat_track = internal_track
         self.players = players
+        self.fuel_capsules = 3
 
         # Assign station neighbors
         # -> Towards blue side 

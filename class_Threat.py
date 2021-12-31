@@ -1,7 +1,6 @@
 from functools import partialmethod
 from enum import Enum
 
-
 class Threat:
     """
     Definition of a threat

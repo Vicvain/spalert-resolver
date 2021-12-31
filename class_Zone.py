@@ -4,11 +4,14 @@ from class_Station import *
 class Zone():
     """
     Definition of a zone
+    - spaceship = reference to the parent spaceship -> class Spaceship
     - color_str = color used for display purposes -> str
     - upper_station -> class Station
     - lower_station -> class Station
     - energy = quantity of energy in the reactor -> int
+    - max_energy = reactor energy cap -> int
     - shield = quantity of energy in the shield -> int
+    - max shield = shield energy cap -> int
     - threat_track = track for incoming external threats -> class ThreatTrack
     - damage_pile -> [class ZoneDamage]
     - damages -> [class ZoneDamage]
@@ -19,12 +22,15 @@ class Zone():
     - new_turn = prepare for a new turn -> /
     """
 
-    def __init__(self, color_str):
+    def __init__(self, spaceship, color_str, max_energy, max_shield, upper_laser_damage, lower_laser_damage, lower_laser_range, lower_laser_type):
+        self.spaceship = spaceship
         self.color_str = color_str
-        self.upper_station = Station(self, "upper")
-        self.lower_station = Station(self, "lower")
+        self.upper_station = Station(self, "upper", laser_strength=upper_laser_damage, laser_range=3, laser_type=WeaponType.HeavyLaser)
+        self.lower_station = Station(self, "lower", laser_strength=lower_laser_damage, laser_range=lower_laser_range, laser_type=lower_laser_type)
         self.energy = 0
+        self.max_energy = max_energy
         self.shield = 0
+        self.max_shield = max_shield
         self.threat_track = None
         self.damage_pile = []
         self.damages = []

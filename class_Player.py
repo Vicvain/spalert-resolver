@@ -66,13 +66,14 @@ class Player:
                 self.zone.used_gravolift = True
 
             case Action.BUTTON_A:
-                pass
+                self.station.action_a()
 
             case Action.BUTTON_B:
-                pass
+                self.station.action_b()
 
             case Action.BUTTON_C:
                 pass
 
             case Action.BATTLE_BOTS:
                 pass
+            
